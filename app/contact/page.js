@@ -128,7 +128,7 @@ export default function Contact() {
             <div className="bg-card-bg border border-border-color rounded-2xl p-3 shadow-sm overflow-hidden h-72 relative">
               <iframe
                 title="Ho Technical University Google Map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1d3957.568393527265!2d0.4691238!3d6.6008127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1027581fbff64821%3A0xc3f6064f27be08bf!2sHo%20Technical%20University!5e0!3m2!1sen!2sgh!4v1700000000000!5m2!1sen!2sgh"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3968.125553140516!2d0.4645089758778401!3d6.589136122646279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b4fb553a1b32d%3A0x89e2483863484f93!2sHo%20Technical%20University!5e0!3m2!1sen!2sgh!4v1717932900000!5m2!1sen!2sgh"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
