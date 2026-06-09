@@ -12,17 +12,16 @@ import { db, auth } from '../../lib/db';
 export default function AdminDashboard() {
   const router = useRouter();
   const [session, setSession] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview'); // overview, slideshow, announcements, events, gallery, executives, resources, scriptures, settings
+  const [activeTab, setActiveTab] = useState('overview'); // overview, slideshow, announcements, events, executives, resources, scriptures, settings
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   // Database Data States
-  const [stats, setStats] = useState({ slideshow: 0, announcements: 0, events: 0, gallery: 0, executives: 0, resources: 0, messages: 0 });
+  const [stats, setStats] = useState({ slideshow: 0, announcements: 0, events: 0, executives: 0, resources: 0, messages: 0 });
   const [slideshow, setSlideshow] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [events, setEvents] = useState([]);
-  const [gallery, setGallery] = useState([]);
   const [executives, setExecutives] = useState([]);
   const [resources, setResources] = useState([]);
   const [verses, setVerses] = useState([]);
@@ -60,7 +59,6 @@ export default function AdminDashboard() {
       const s = await db.getSlideshow();
       const a = await db.getAnnouncements();
       const e = await db.getEvents();
-      const g = await db.getGallery();
       const exec = await db.getExecutives();
       const r = await db.getKhutbahNotes();
       const v = await db.getQuranVerses();
@@ -71,7 +69,6 @@ export default function AdminDashboard() {
       setSlideshow(s);
       setAnnouncements(a);
       setEvents(e);
-      setGallery(g);
       setExecutives(exec);
       setResources(r);
       setVerses(v);
@@ -83,7 +80,6 @@ export default function AdminDashboard() {
         slideshow: s.length,
         announcements: a.length,
         events: e.length,
-        gallery: g.length,
         executives: exec.length,
         resources: r.length,
         messages: c.length
@@ -162,8 +158,6 @@ export default function AdminDashboard() {
         await db.saveAnnouncement(data);
       } else if (type === 'events') {
         await db.saveEvent(data);
-      } else if (type === 'gallery') {
-        await db.saveGalleryItem(data);
       } else if (type === 'slideshow') {
         if (!data.display_order) data.display_order = slideshow.length + 1;
         await db.saveSlideshowItem(data);
@@ -191,7 +185,6 @@ export default function AdminDashboard() {
     try {
       if (tabName === 'announcements') await db.deleteAnnouncement(id);
       else if (tabName === 'events') await db.deleteEvent(id);
-      else if (tabName === 'gallery') await db.deleteGalleryItem(id);
       else if (tabName === 'slideshow') await db.deleteSlideshowItem(id);
       else if (tabName === 'executives') await db.deleteExecutive(id);
       else if (tabName === 'resources') await db.deleteKhutbahNote(id);
@@ -252,7 +245,6 @@ export default function AdminDashboard() {
     { id: 'slideshow', label: 'Slideshow', icon: Image },
     { id: 'announcements', label: 'Announcements', icon: Bell },
     { id: 'events', label: 'Events', icon: Calendar },
-    { id: 'gallery', label: 'Gallery', icon: Image },
     { id: 'executives', label: 'Executives', icon: Users },
     { id: 'resources', label: 'Resources (Khutbah)', icon: FileText },
     { id: 'scriptures', label: 'Quran & Hadith', icon: BookOpen },
@@ -344,11 +336,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Counters Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                   {[
                     { label: 'Announcements', count: stats.announcements, color: 'text-primary' },
                     { label: 'Events', count: stats.events, color: 'text-gold' },
-                    { label: 'Gallery Files', count: stats.gallery, color: 'text-blue-500' },
                     { label: 'Slides', count: stats.slideshow, color: 'text-purple-500' },
                     { label: 'Khutbah Notes', count: stats.resources, color: 'text-indigo-500' },
                     { label: 'Messages', count: stats.messages, color: 'text-red-500' }
@@ -574,45 +565,6 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => handleDelete('events', ev.id)}
                           className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded cursor-pointer"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* GALLERY MODULE */}
-            {activeTab === 'gallery' && (
-              <div className="space-y-6 animate-fade-in">
-                <div className="flex justify-between items-center border-b border-border-color pb-4">
-                  <div>
-                    <h1 className="text-2xl font-extrabold text-foreground">Manage Photo Gallery</h1>
-                    <p className="text-xs text-muted">Upload and classify visual memories into categories.</p>
-                  </div>
-                  <button
-                    onClick={() => openFormDialog('gallery')}
-                    className="flex items-center space-x-2 px-4 py-2 text-xs font-bold text-white bg-primary hover:bg-primary/95 dark:bg-secondary dark:text-black rounded-lg cursor-pointer shadow"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span>Upload Image</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {gallery.map((item) => (
-                    <div
-                      key={item.id}
-                      className="bg-card-bg border border-border-color rounded-xl overflow-hidden relative group"
-                    >
-                      <img src={item.image_url} alt="" className="w-full h-36 object-cover" />
-                      <div className="p-3 flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-muted uppercase tracking-wider">{item.category}</span>
-                        <button
-                          onClick={() => handleDelete('gallery', item.id)}
-                          className="p-1.5 text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded cursor-pointer"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -1130,39 +1082,6 @@ export default function AdminDashboard() {
                       className="text-xs text-muted"
                     />
                     {dialog.data.banner_url && <img src={dialog.data.banner_url} alt="" className="h-20 w-36 object-cover rounded mt-2 border border-border-color" />}
-                  </div>
-                </>
-              )}
-
-              {/* GALLERY FORM FIELDS */}
-              {dialog.type === 'gallery' && (
-                <>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-foreground/80">Photo Category</label>
-                    <select
-                      required
-                      value={dialog.data.category || ''}
-                      onChange={(e) => setDialog({ ...dialog, data: { ...dialog.data, category: e.target.value } })}
-                      className="bg-light-gray dark:bg-muted-bg text-foreground text-sm px-4 py-2 rounded-lg w-full border border-transparent focus:outline-none focus:border-primary"
-                    >
-                      <option value="">Select Category...</option>
-                      <option value="Ramadan">Ramadan</option>
-                      <option value="Eid">Eid</option>
-                      <option value="Conferences">Conferences</option>
-                      <option value="Seminars">Seminars</option>
-                      <option value="Community Service">Community Service</option>
-                      <option value="General Activities">General Activities</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-foreground/80 block">Image File</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e, 'gallery', 'image_url')}
-                      className="text-xs text-muted"
-                    />
-                    {dialog.data.image_url && <img src={dialog.data.image_url} alt="" className="h-20 w-36 object-cover rounded mt-2 border border-border-color" />}
                   </div>
                 </>
               )}

@@ -121,9 +121,6 @@ export default function Footer() {
                 <Link href="/announcements" className="hover:text-primary dark:hover:text-secondary transition-colors">Announcements</Link>
               </li>
               <li>
-                <Link href="/gallery" className="hover:text-primary dark:hover:text-secondary transition-colors">Photo Gallery</Link>
-              </li>
-              <li>
                 <Link href="/resources" className="hover:text-primary dark:hover:text-secondary transition-colors">Islamic Resources</Link>
               </li>
             </ul>

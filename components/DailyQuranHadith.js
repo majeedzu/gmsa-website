@@ -10,28 +10,72 @@ export default function DailyQuranHadith() {
   const [hadith, setHadith] = useState(null);
 
   useEffect(() => {
-    // Deterministic Day of Year index: 0 to 365
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
     const diff = now - start;
     const oneDay = 1000 * 60 * 60 * 24;
     const dayOfYear = Math.floor(diff / oneDay);
 
-    // Fetch and rotate Quran Verses
-    db.getQuranVerses().then(verses => {
-      if (verses && verses.length > 0) {
-        const index = dayOfYear % verses.length;
-        setVerse(verses[index]);
+    // 1. Fetch Quran Verse from API
+    const loadQuranVerse = async () => {
+      try {
+        const randomAyah = Math.floor(Math.random() * 6236) + 1;
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomAyah}/editions/quran-uthmani,en.sahih`);
+        if (!res.ok) throw new Error('API request failed');
+        const json = await res.json();
+        if (json.status === 'OK' && json.data && json.data.length >= 2) {
+          const arabicObj = json.data[0];
+          const englishObj = json.data[1];
+          setVerse({
+            arabic_text: arabicObj.text,
+            english_translation: englishObj.text,
+            surah_name: arabicObj.surah.englishName,
+            verse_number: arabicObj.numberInSurah
+          });
+          return;
+        }
+        throw new Error('Invalid response structure');
+      } catch (error) {
+        console.warn('Quran API error, falling back to local DB:', error);
+        db.getQuranVerses().then(verses => {
+          if (verses && verses.length > 0) {
+            const index = dayOfYear % verses.length;
+            setVerse(verses[index]);
+          }
+        });
       }
-    });
+    };
 
-    // Fetch and rotate Hadiths
-    db.getHadiths().then(hadithsList => {
-      if (hadithsList && hadithsList.length > 0) {
-        const index = dayOfYear % hadithsList.length;
-        setHadith(hadithsList[index]);
+    // 2. Fetch Hadith from API
+    const loadHadith = async () => {
+      try {
+        const randomHadithNum = Math.floor(Math.random() * 7000) + 1;
+        const res = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari/${randomHadithNum}.json`);
+        if (!res.ok) throw new Error('Hadith API request failed');
+        const json = await res.json();
+        if (json && json.hadiths && json.hadiths.length > 0) {
+          const h = json.hadiths[0];
+          setHadith({
+            hadith_text: h.text,
+            source: json.metadata.name || 'Sahih al-Bukhari',
+            reference: `Hadith No: ${h.hadithnumber}`
+          });
+          return;
+        }
+        throw new Error('Invalid Hadith response structure');
+      } catch (error) {
+        console.warn('Hadith API error, falling back to local DB:', error);
+        db.getHadiths().then(hadithsList => {
+          if (hadithsList && hadithsList.length > 0) {
+            const index = dayOfYear % hadithsList.length;
+            setHadith(hadithsList[index]);
+          }
+        });
       }
-    });
+    };
+
+    loadQuranVerse();
+    loadHadith();
   }, []);
 
   return (

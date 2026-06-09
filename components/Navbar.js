@@ -64,7 +64,6 @@ export default function Navbar() {
     { label: 'About Us', href: '/about' },
     { label: 'Events', href: '/events' },
     { label: 'Announcements', href: '/announcements' },
-    { label: 'Gallery', href: '/gallery' },
     { label: 'Resources', href: '/resources' },
     { label: 'Contact', href: '/contact' }
   ];
