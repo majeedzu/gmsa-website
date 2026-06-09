@@ -189,7 +189,7 @@ insert into public.website_settings (key, value) values
 ('socialFacebook', '"https://facebook.com/gmsahtu"'),
 ('socialTwitter', '"https://twitter.com/gmsahtu"'),
 ('socialInstagram', '"https://instagram.com/gmsahtu"'),
-('footerText', '"© 2026 Ghana Muslim Students\' Association - Ho Technical University Branch. All rights reserved."')
+('footerText', '"© 2026 Ghana Muslim Students'' Association - Ho Technical University Branch. All rights reserved."')
 on conflict (key) do nothing;
 
 -- Insert default Quran verses
