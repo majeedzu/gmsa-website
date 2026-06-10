@@ -206,3 +206,27 @@ insert into public.hadiths (hadith_text, source, reference) values
 ('Actions are to be judged only by intentions, and a man will have only what he intended.', 'Sahih Bukhari & Sahih Muslim', 'Hadith 1, 40 Hadith Nawawi'),
 ('None of you truly believes until he loves for his brother what he loves for himself.', 'Sahih Bukhari & Sahih Muslim', 'Hadith 13, 40 Hadith Nawawi'),
 ('Whoever follows a path in the pursuit of knowledge, Allah will make a path to Paradise easy for him.', 'Sahih Muslim', 'Book 39, Hadith 6518');
+
+-- ====================================================================
+-- AUTOMATED PROFILE CREATION & ADMIN SYNC
+-- ====================================================================
+
+-- 13. Profile creation function and trigger for new sign-ups
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, role)
+  values (new.id, new.email, 'admin'); -- Default new users to admin role for dashboard access
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create or replace trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- 14. Retroactively promote all existing registered users to admin profiles
+insert into public.profiles (id, email, role)
+select id, email, 'admin'
+from auth.users
+on conflict (id) do update set role = 'admin';
